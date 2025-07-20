@@ -1,0 +1,7 @@
+{
+  "name": "schemas",
+  "version": "1.0.0",
+  "main": "types.ts",
+  "type": "module",
+  "dependencies": {}
+}

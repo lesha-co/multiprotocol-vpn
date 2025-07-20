@@ -1,0 +1,33 @@
+{
+  "name": "awg-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "adduser.js",
+  "scripts": {
+    "init": "node src/init.js",
+    "start": "node src/apiserver/index.js",
+    "dev": "nodemon src/apiserver/index.js"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "express": "^4.21.2",
+    "raw-body": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.15",
+    "nodemon": "^3.0.1",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lesha-co/amnezia-wireguard-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lesha-co/amnezia-wireguard-api/issues"
+  },
+  "homepage": "https://github.com/lesha-co/amnezia-wireguard-api#readme"
+}
