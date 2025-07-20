@@ -1,2 +1,7 @@
 node_modules/
 .DS_Store
+tsconfig.tsbuildinfo
+awg-server/data
+bot/.env
+bot/db.sqlite
+bot/src/inventory.ts
