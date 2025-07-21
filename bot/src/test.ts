@@ -2,7 +2,8 @@ import { test, describe } from "node:test";
 import { strictEqual, ok, match } from "node:assert";
 import { secureFetch } from "./api/fetch.ts";
 import { inventory } from "./inventory.ts";
-import { Key, Outline } from "./api/outline.ts";
+import { Key } from "../../schemas/types.ts";
+import { Outline } from "./lib/backends/outline.ts";
 
 const servers: OutlineServer[] = inventory.servers.filter(
   (x) => x.type === "outline",
@@ -46,6 +47,7 @@ describe("SecureFetch Certificate Validation Tests", () => {
     try {
       await secureFetch(`${baseUrl}/server`, {
         method: "GET",
+        sha256fingerprint: "",
         // No sha256fingerprint provided
       });
 

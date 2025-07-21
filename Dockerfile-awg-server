@@ -17,11 +17,5 @@ RUN npm install
 # Copy application files
 COPY . .
 
-RUN rm awgstart awguser readme serverip.cfg vpn_params.cfg
-
-
-# Run as root (required for WireGuard operations)
-USER root
-
 # Default command
-CMD ["./run.sh"]
+CMD ["./awg-server/run.sh"]

@@ -2,7 +2,7 @@
 # Exit immediately if any command fails (non-zero exit status)
 set -e
 
-npm run init
+npm run awg-server:init
 # Start AmneziaWG interface
 awg-quick up /data/awg0.conf
 
@@ -10,7 +10,7 @@ awg-quick up /data/awg0.conf
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 # Start the Node.js application
-node src/apiserver
+npm run awg-server:start-api
 
 while true; do
     sleep 1

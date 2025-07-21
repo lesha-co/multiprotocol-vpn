@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import express from "express";
 import https from "node:https";
 import router from "./router.js";

@@ -1,15 +1,15 @@
 services:
-  amneziawg-api:
+  awg-server:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: amneziawg-api
+      dockerfile: Dockerfile-awg-server
+    container_name: awg-server
     ports:
-      - "3444:3444"
-      - "51000:51000/udp"
+      - "${PORT}:${PORT}"
+      - "${AWG_PORT}:${AWG_PORT}/udp"
     environment:
-      - PORT=3444
-      - AWG_PORT=51000
+      - PORT=${PORT}
+      - AWG_PORT={AWG_PORT}
       - CONFIG=/data/config.json
     privileged: true
     cap_add:
@@ -28,6 +28,16 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile-telegram-bot
+    container_name: tg-bot
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - SQLITE_FILENAME=${SQLITE_FILENAME}
+      - OUTLINE_NEW_KEY_METHOD=${OUTLINE_NEW_KEY_METHOD}
 
 networks:
   amneziawg-network:

@@ -1,25 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "es2024",
-    "module": "esnext",
-    "lib": ["es2024", "dom"],
-    "moduleResolution": "node",
-
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "composite": true,
-    "incremental": true,
-
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true
-  },
+  "compilerOptions": {},
   "exclude": ["node_modules"]
 }

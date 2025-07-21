@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import fsp from "node:fs/promises";
 
 import { makeConfig } from "./facilities/mkConfig.ts";
