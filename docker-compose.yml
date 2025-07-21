@@ -9,7 +9,7 @@ services:
       - "${AWG_PORT}:${AWG_PORT}/udp"
     environment:
       - PORT=${PORT}
-      - AWG_PORT={AWG_PORT}
+      - AWG_PORT=${AWG_PORT}
       - CONFIG=/data/config.json
     privileged: true
     cap_add:
