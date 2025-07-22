@@ -2,16 +2,16 @@ import fs from "node:fs";
 import { execSync } from "node:child_process";
 import path from "node:path";
 
-import { generateWireguardKeys } from "./facilities/wireguardKeys.ts";
-import { checkRootPrivileges } from "./facilities/checkRootPrivileges.ts";
-import type { Config } from "./schema.ts";
+import { generateWireguardKeys } from "../../facilities/wireguardKeys.ts";
+import type { Config } from "../../facilities/configSchema.ts";
+import assert from "node:assert";
 
-export function restart(config:Config) {
+export function restart(config: Config) {
   // run
   // awg-quick down awg0
   // awg-quick up awg0
   const interfaceName = path
-    .basename(config.SERVER_INTERFACE_CONFIG)
+    .basename(config.WIREGUARD_SERVER_INTERFACE_CONFIG)
     .split(".")[0];
   try {
     execSync(`awg-quick down ${interfaceName}`, {
@@ -24,12 +24,15 @@ export function restart(config:Config) {
   });
 }
 
-function validateEnvironment(config:Config) {
+function validateEnvironment(config: Config) {
   // Check if running as root
-  checkRootPrivileges();
+  assert(
+    process.getuid && process.getuid() === 0,
+    "Please run the script as root.",
+  );
 
   // Check if required files exist
-  const requiredFiles = [config.SERVER_INTERFACE_CONFIG];
+  const requiredFiles = [config.WIREGUARD_SERVER_INTERFACE_CONFIG];
 
   for (const file of requiredFiles) {
     if (!fs.existsSync(file)) {
@@ -39,7 +42,7 @@ function validateEnvironment(config:Config) {
   }
 }
 
-function validateUsername(config:Config, username:string) {
+function validateUsername(config: Config, username: string) {
   if (!username) {
     throw new Error("Username is required");
   }
@@ -52,14 +55,20 @@ function validateUsername(config:Config, username:string) {
   }
 
   // Check if user already exists
-  const serverConfig = fs.readFileSync(config.SERVER_INTERFACE_CONFIG, "utf8");
+  const serverConfig = fs.readFileSync(
+    config.WIREGUARD_SERVER_INTERFACE_CONFIG,
+    "utf8",
+  );
   if (serverConfig.includes(`# Peer configuration for ${username}`)) {
     throw new Error(`User ${username} already exists`);
   }
 }
 
-function getNextClientIP(config:Config) {
-  const serverConfig = fs.readFileSync(config.SERVER_INTERFACE_CONFIG, "utf8");
+function getNextClientIP(config: Config) {
+  const serverConfig = fs.readFileSync(
+    config.WIREGUARD_SERVER_INTERFACE_CONFIG,
+    "utf8",
+  );
   const ipRegex = /AllowedIPs = 192\.168\.200\.(\d+)/g;
   const ips = [];
   let match;
@@ -69,19 +78,19 @@ function getNextClientIP(config:Config) {
   }
 
   if (ips.length === 0) {
-    return `${config.CLIENT_IP_BASE}2`;
+    return `${config.WIREGUARD_CLIENT_IP_BASE}2`;
   }
 
   const lastIp = Math.max(...ips);
-  return `${config.CLIENT_IP_BASE}${lastIp + 1}`;
+  return `${config.WIREGUARD_CLIENT_IP_BASE}${lastIp + 1}`;
 }
 
 function addPeerToServerConfig(
-  config:Config,
-  username:string,
-  clientPublicKey:string,
-  psk:string,
-  clientIP:string,
+  config: Config,
+  username: string,
+  clientPublicKey: string,
+  psk: string,
+  clientIP: string,
 ) {
   console.log(
     `Adding new peer ${username} to server config with IP ${clientIP}...`,
@@ -96,15 +105,15 @@ function addPeerToServerConfig(
     `AllowedIPs = ${clientIP}/32`,
   ].join("\n");
 
-  fs.appendFileSync(config.SERVER_INTERFACE_CONFIG, peerConfig);
+  fs.appendFileSync(config.WIREGUARD_SERVER_INTERFACE_CONFIG, peerConfig);
 }
 
 function generateClientConfig(
-  config:Config,
-  username:string,
-  clientPrivateKey:string,
-  psk:string,
-  clientIP:string,
+  config: Config,
+  username: string,
+  clientPrivateKey: string,
+  psk: string,
+  clientIP: string,
 ) {
   console.log(`Generating client config for ${username}...`);
 
@@ -112,21 +121,21 @@ function generateClientConfig(
     `[Interface]`,
     `PrivateKey = ${clientPrivateKey}`,
     `Address = ${clientIP}/32`,
-    `DNS = ${config.SERVER_IP.dns}`,
+    `DNS = ${config.WIREGUARD_DNS}`,
     ``,
-    `${config.VPN_PARAMS}`,
+    `${config.WIREGUARD_VPN_PARAMS}`,
     ``,
     `[Peer]`,
-    `PublicKey = ${config.SERVER_KEYS.PUBLIC_KEY}`,
+    `PublicKey = ${config.WIREGUARD_PUBLIC_KEY}`,
     `PresharedKey = ${psk}`,
-    `Endpoint = ${config.SERVER_IP.serverIP}:${config.SERVER_IP.serverPort}`,
+    `Endpoint = ${config.WIREGUARD_EXTERNAL_IP}:${config.WIREGUARD_PORT}`,
     `AllowedIPs = 0.0.0.0/0, ::/0`,
   ].join("\n");
 
   return clientConfig;
 }
 
-export function addUser(config:Config, username:string) {
+export function addUser(config: Config, username: string) {
   console.log(`Adding user: ${username}`);
 
   // Validate environment
@@ -154,10 +163,10 @@ export function addUser(config:Config, username:string) {
   const clientConfigFileName = `${username}.conf`;
 
   const userConfigLocation = path.join(
-    config.USER_KEYS_ROOT,
+    config.WIREGUARD_USER_KEYS_ROOT,
     clientConfigFileName,
   );
-  fs.mkdirSync(config.USER_KEYS_ROOT, { recursive: true });
+  fs.mkdirSync(config.WIREGUARD_USER_KEYS_ROOT, { recursive: true });
   fs.writeFileSync(userConfigLocation, clientConfig);
   console.log(`Client config generated: ${userConfigLocation}`);
 
@@ -177,10 +186,13 @@ export function addUser(config:Config, username:string) {
   };
 }
 
-export function deleteUser(config:Config, username:string) {
+export function deleteUser(config: Config, username: string) {
   validateEnvironment(config);
 
-  const serverConfig = fs.readFileSync(config.SERVER_INTERFACE_CONFIG, "utf8");
+  const serverConfig = fs.readFileSync(
+    config.WIREGUARD_SERVER_INTERFACE_CONFIG,
+    "utf8",
+  );
   if (!serverConfig.includes(`# Peer configuration for ${username}`)) {
     throw new Error(`User ${username} does not exist`);
   }
@@ -204,10 +216,16 @@ export function deleteUser(config:Config, username:string) {
     filteredLines.push(lines[i]);
   }
 
-  fs.writeFileSync(config.SERVER_INTERFACE_CONFIG, filteredLines.join("\n"));
+  fs.writeFileSync(
+    config.WIREGUARD_SERVER_INTERFACE_CONFIG,
+    filteredLines.join("\n"),
+  );
 
   // Remove client config file
-  const configFile = path.join(config.USER_KEYS_ROOT, `${username}.conf`);
+  const configFile = path.join(
+    config.WIREGUARD_USER_KEYS_ROOT,
+    `${username}.conf`,
+  );
   if (fs.existsSync(configFile)) {
     fs.unlinkSync(configFile);
   }
@@ -217,10 +235,13 @@ export function deleteUser(config:Config, username:string) {
   return true;
 }
 
-export function listUsers(config:Config) {
+export function listUsers(config: Config) {
   validateEnvironment(config);
 
-  const serverConfig = fs.readFileSync(config.SERVER_INTERFACE_CONFIG, "utf8");
+  const serverConfig = fs.readFileSync(
+    config.WIREGUARD_SERVER_INTERFACE_CONFIG,
+    "utf8",
+  );
   const userRegex = /# Peer configuration for (\w+)/g;
   const users = [];
   let match;
@@ -233,7 +254,7 @@ export function listUsers(config:Config) {
     );
     const ip = ipMatch ? ipMatch[1] : "Unknown";
     const userConfigLocation = path.join(
-      config.USER_KEYS_ROOT,
+      config.WIREGUARD_USER_KEYS_ROOT,
       `${username}.conf`,
     );
     const userConfig = fs.readFileSync(userConfigLocation, "utf8");

@@ -2,10 +2,10 @@ import express from "express";
 import https from "node:https";
 import router from "./router.ts";
 import fs from "node:fs";
-import ensureSSLCertificate from "../facilities/certificate.ts";
 import getRawBody from "raw-body";
-import { readConfigFromDefaultLocation } from "../facilities/readConfig.ts";
-const config = await readConfigFromDefaultLocation();
+import ensureSSLCertificate from "../../facilities/ensureSSLCertificate.ts";
+import { readConfigFromEnv } from "../../facilities/readConfig.ts";
+const config = await readConfigFromEnv();
 const fingerprint = ensureSSLCertificate(config);
 const app = express();
 
@@ -20,7 +20,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use("/" + config.ADMIN.SECRET_ENDPOINT, router);
+app.use("/" + config.WIREGUARD_ADMIN_SECRET_ENDPOINT, router);
 
 // Default catch-all endpoint for logging unimplemented routes
 app.all("*", (req, res) => {
@@ -33,21 +33,17 @@ app.all("*", (req, res) => {
   });
 });
 
-if (!fs.existsSync(config.ADMIN.HTTPS_KEY)) {
-  process.exit(1);
-}
-
 https
   .createServer(
     {
-      key: fs.readFileSync(config.ADMIN.HTTPS_KEY, "utf8"),
-      cert: fs.readFileSync(config.ADMIN.HTTPS_KEY, "utf8"),
+      key: fs.readFileSync(config.HTTPS_KEY_PATH, "utf8"),
+      cert: fs.readFileSync(config.HTTPS_CRT_PATH, "utf8"),
     },
     app,
   )
-  .listen(config.ADMIN.ADMIN_PORT, () => {
+  .listen(config.WIREGUARD_ADMIN_PORT, () => {
     console.log(
-      `WireGuard API server running on HTTPS port ${config.ADMIN.ADMIN_PORT}`,
+      `WireGuard API server running on HTTPS port ${config.WIREGUARD_ADMIN_PORT}`,
     );
     // console.log(`Available endpoints:`);
     // console.log(`  GET    /health              - Health check`);
@@ -57,7 +53,7 @@ https
     // console.log(`  GET    /access-keys/:id     - Get specific access key`);
     // console.log(`  DELETE /access-keys/:id     - Delete access key`);
     const cfg = {
-      apiUrl: `https://${config.SERVER_IP.serverIP}:${config.ADMIN.ADMIN_PORT}/${config.ADMIN.SECRET_ENDPOINT}`,
+      apiUrl: `https://${config.WIREGUARD_EXTERNAL_IP}:${config.WIREGUARD_ADMIN_PORT}/${config.WIREGUARD_ADMIN_SECRET_ENDPOINT}`,
       certSha256: fingerprint,
     };
     console.log(JSON.stringify(cfg, null, 2));

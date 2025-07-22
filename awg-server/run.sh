@@ -2,7 +2,6 @@
 # Exit immediately if any command fails (non-zero exit status)
 set -e
 
-npm run awg-server:init
 # Start AmneziaWG interface
 awg-quick up /data/awg0.conf
 

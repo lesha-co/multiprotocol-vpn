@@ -1,0 +1,17 @@
+FROM node:23
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json first for better Docker layer caching
+COPY package.json package-lock.json ./
+
+# Install Node.js dependencies
+RUN npm ci --only=production
+
+# Copy application files
+COPY . .
+
+
+# Default command
+CMD ["npm", "run", "config"]

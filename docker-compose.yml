@@ -1,16 +1,23 @@
 services:
-  awg-server:
+  configurator:
     build:
       context: .
-      dockerfile: Dockerfile-awg-server
+      dockerfile: .dockerfiles/Dockerfile-configurator
+    container_name: configurator
+    env_file: .env
+    volumes:
+      - ./data:/data
+      - ./.env:/.env
+
+  awg-server:
+    build:
+      context: .dockerfiles
+      dockerfile: .dockerfiles/Dockerfile-awg-server
     container_name: awg-server
     ports:
-      - "${PORT}:${PORT}"
+      - "${AWG_ADMIN_PORT}:${AWG_ADMIN_PORT}"
       - "${AWG_PORT}:${AWG_PORT}/udp"
-    environment:
-      - PORT=${PORT}
-      - AWG_PORT=${AWG_PORT}
-      - CONFIG_PATH=${CONFIG_PATH}
+
     privileged: true
     cap_add:
       - NET_ADMIN
@@ -19,6 +26,7 @@ services:
       - /dev/net/tun
     volumes:
       - ./data:/data
+      - ./.env:/.env
     restart: unless-stopped
     networks:
       - amneziawg-network
@@ -32,12 +40,41 @@ services:
   telegram-bot:
     build:
       context: .
-      dockerfile: Dockerfile-telegram-bot
+      dockerfile: .dockerfiles/Dockerfile-telegram-bot
     container_name: tg-bot
+    volumes:
+      - ./.env:/.env
+    restart: unless-stopped
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - SQLITE_FILENAME=${SQLITE_FILENAME}
-      - OUTLINE_NEW_KEY_METHOD=${OUTLINE_NEW_KEY_METHOD}
+
+  shadowbox:
+    image: quay.io/outline/shadowbox:stable
+    container_name: shadowbox
+    network_mode: host
+    restart: always
+    logging:
+      driver: local
+
+    volumes:
+      - ./data:/data
+      - ./.env:/.env
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=outline"
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    logging:
+      driver: local
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --label-enable --scope=outline --tlsverify --interval ${WATCHTOWER_REFRESH_SECONDS:-3600}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=outline"
 
 networks:
   amneziawg-network:

@@ -9,12 +9,8 @@ export function randomString() {
 export class Outline {
   public mgmt: string;
   public sha256fingerprint: string;
-  public method: string;
 
-  constructor(mgmt: string, sha256fingerprint: string, method?: string) {
-    const m = method ?? process.env.OUTLINE_NEW_KEY_METHOD;
-    assert(m);
-    this.method = m;
+  constructor(mgmt: string, sha256fingerprint: string) {
     this.mgmt = mgmt;
     this.sha256fingerprint = sha256fingerprint;
   }
@@ -59,7 +55,7 @@ export class Outline {
         name,
         password: randomString(),
         port: server.portForNewAccessKeys,
-        method: this.method,
+        method: "chacha20-ietf-poly1305",
       }),
     });
     assert(response.status === 201);

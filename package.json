@@ -3,28 +3,31 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.3",
     "@types/node": "^24.0.15",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
   },
   "scripts": {
-    "awg-server:init": "node awg-server/src/init.ts",
-    "awg-server:start-api": "node awg-server/src/apiserver/index.ts",
+    "config": "node configurator/init.ts",
+    "awg-server:start-api": "node awg-server/src/index.ts",
     "tgbot:start": "node bot/src/index.ts",
     "tgbot:test": "node --test bot/src/test.ts"
   },
   "dependencies": {
+    "@stablelib/base64": "^2.0.1",
+    "@stablelib/x25519": "^2.0.1",
     "@types/express": "^5.0.3",
-    "express": "^4.21.2",
-    "raw-body": "^3.0.0",
-    "zod": "^4.0.5",
     "@types/node": "^24.0.13",
     "@types/node-telegram-bot-api": "^0.64.9",
+    "dotenv": "^17.2.0",
+    "express": "^4.21.2",
     "node-telegram-bot-api": "^0.66.0",
+    "raw-body": "^3.0.0",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "typescript": "^5.8.3",
-    "undici": "^7.11.0"
+    "undici": "^7.11.0",
+    "zod": "^4.0.5"
   }
 }

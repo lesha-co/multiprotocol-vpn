@@ -1,0 +1,6 @@
+FROM quay.io/outline/shadowbox:stable
+
+
+COPY shadowbox/run.sh .
+
+CMD ["./run.sh"]

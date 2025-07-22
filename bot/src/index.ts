@@ -6,6 +6,9 @@ import { stateMachine } from "./machine.ts";
 import type { TelegramDialogContext } from "./machine.ts";
 import { getConsumer } from "./lib/telegram/getConsumer.ts";
 import type { Meta } from "./lib/telegram/getConsumer.ts";
+import { readConfigFromEnv } from "../../facilities/readConfig.ts";
+
+readConfigFromEnv();
 
 const bot = getBot();
 const p = pipe<TelegramBot.Message>();
