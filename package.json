@@ -1,6 +1,7 @@
 {
   "name": "vpn-multiprotocol",
   "private": true,
+  "type": "module",
   "devDependencies": {
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
@@ -8,10 +9,10 @@
     "nodemon": "^3.0.1"
   },
   "scripts": {
-    "awg-server:init": "node awg-server/src/init.js",
+    "awg-server:init": "node awg-server/src/init.ts",
     "awg-server:start-api": "node awg-server/src/apiserver/index.ts",
-    "tgbot:start": "node  --env-file=bot/.env bot/src/index.ts",
-    "tgbot:test": "node --env-file=bot/.env --test bot/src/test.ts"
+    "tgbot:start": "node bot/src/index.ts",
+    "tgbot:test": "node --test bot/src/test.ts"
   },
   "dependencies": {
     "@types/express": "^5.0.3",

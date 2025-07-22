@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { Config } from "../schema";
+import { Config } from "../schema.ts";
 import fsp from "node:fs/promises";
 
 export async function readConfig(configPath: string) {

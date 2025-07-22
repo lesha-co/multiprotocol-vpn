@@ -1,13 +1,15 @@
 FROM metaligh/amneziawg
+RUN apt update && apt install -y curl
+# Download and install nvm and Node.js in a single RUN command:
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && \
+    export NVM_DIR="$HOME/.nvm" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+    nvm install 23 && \
+    nvm use 23 && \
+    nvm alias default 23 && \
+    ln -sf $NVM_DIR/versions/node/$(nvm version)/bin/node /usr/local/bin/node && \
+    ln -sf $NVM_DIR/versions/node/$(nvm version)/bin/npm /usr/local/bin/npm
 
-# Download and install nvm:
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-# in lieu of restarting the shell
-# This sources the nvm script to make the nvm command available in the current shell session
-# The backslash escapes the dot command to ensure it works properly in the Docker RUN context
-RUN \. "$HOME/.nvm/nvm.sh"
-# Download and install Node.js:
-RUN nvm install 24
 
 # Copy package.json first for better Docker layer caching
 COPY package.json ./

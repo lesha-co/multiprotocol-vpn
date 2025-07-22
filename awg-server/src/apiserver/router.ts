@@ -1,7 +1,7 @@
-import { readConfigFromDefaultLocation } from "../facilities/readConfig.js";
-import { addUser, deleteUser, listUsers } from "../WGUserManager.js";
+import { readConfigFromDefaultLocation } from "../facilities/readConfig.ts";
+import { addUser, deleteUser, listUsers } from "../WGUserManager.ts";
 import express from "express";
-import { Key, Server, ListKeysResponse } from "schemas";
+import { Key, Server, ListKeysResponse } from "../../../schemas/types.ts";
 const config = await readConfigFromDefaultLocation();
 const router = express.Router();
 

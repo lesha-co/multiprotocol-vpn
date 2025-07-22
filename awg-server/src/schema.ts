@@ -3,7 +3,7 @@ import z from "zod";
 export const Config = z.object({
   SERVER_IP: z.object({
     serverIP: z.string(),
-    serverPort: z.number(),
+    serverPort: z.string(),
     dns: z.string(),
   }),
   SERVER_KEYS: z.object({
@@ -12,7 +12,7 @@ export const Config = z.object({
   }),
   ADMIN: z.object({
     HTTPS_KEY: z.string(),
-    ADMIN_PORT: z.number(),
+    ADMIN_PORT: z.string(),
     SECRET_ENDPOINT: z.string(),
   }),
   VPN_PARAMS: z.string(),

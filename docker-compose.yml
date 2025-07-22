@@ -10,7 +10,7 @@ services:
     environment:
       - PORT=${PORT}
       - AWG_PORT=${AWG_PORT}
-      - CONFIG=/data/config.json
+      - CONFIG_PATH=${CONFIG_PATH}
     privileged: true
     cap_add:
       - NET_ADMIN

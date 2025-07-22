@@ -1,10 +1,10 @@
 import express from "express";
 import https from "node:https";
-import router from "./router.js";
+import router from "./router.ts";
 import fs from "node:fs";
-import ensureSSLCertificate from "../facilities/certificate.js";
+import ensureSSLCertificate from "../facilities/certificate.ts";
 import getRawBody from "raw-body";
-import { readConfigFromDefaultLocation } from "../facilities/readConfig.js";
+import { readConfigFromDefaultLocation } from "../facilities/readConfig.ts";
 const config = await readConfigFromDefaultLocation();
 const fingerprint = ensureSSLCertificate(config);
 const app = express();

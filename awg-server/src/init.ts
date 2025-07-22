@@ -37,7 +37,7 @@ export async function main() {
   console.log("Initializing VPN server...");
   checkRootPrivileges();
 
-  const configPath = process.env.CONFIG;
+  const configPath = process.env.CONFIG_PATH;
   assert(configPath);
   console.log(`Checking if config file exists... (${configPath})`);
   // check data/config.json

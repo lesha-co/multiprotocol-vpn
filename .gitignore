@@ -6,3 +6,4 @@ bot/.env
 bot/db.sqlite
 bot/src/inventory.ts
 .env
+data/

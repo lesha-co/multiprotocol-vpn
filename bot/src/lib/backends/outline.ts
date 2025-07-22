@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import crypto from "node:crypto";
 import { secureFetch } from "../../api/fetch.ts";
-import { ListKeysResponse, Key, Server } from "schemas";
+import { ListKeysResponse, Key, Server } from "../../../../schemas/types.ts";
 export function randomString() {
   return crypto.randomBytes(24).toString("base64");
 }
