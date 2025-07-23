@@ -66,6 +66,8 @@ export async function createConfigObject(
     SB_API_PREFIX: randomString(),
     SB_CERTIFICATE_FILE: "/data/cert.crt",
     SB_PRIVATE_KEY_FILE: "/data/cert.key",
+
+    INVENTORY_FILE: "/data/inventory.json",
   };
 
   const envString = Object.entries(config)

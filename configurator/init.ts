@@ -6,6 +6,7 @@ import { exists } from "../facilities/exists.ts";
 import { Config } from "../facilities/configSchema.ts";
 import assert from "node:assert";
 import ensureSSLCertificate from "../facilities/ensureSSLCertificate.ts";
+import { ServerInventory } from "../schemas/types.ts";
 
 async function ensureWireguardServerConfig(config: Config) {
   // Create initial server configuration
@@ -34,6 +35,22 @@ async function createFiles(config: Config) {
     recursive: true,
   });
   await makeCertificate(config.HTTPS_KEY_PATH, config.HTTPS_CRT_PATH);
+  const fingerprint = ensureSSLCertificate(config);
+  const initialInventory: ServerInventory[] = [
+    {
+      managementAPI: `https://${config.WIREGUARD_EXTERNAL_IP}:${config.WIREGUARD_ADMIN_PORT}/${config.WIREGUARD_ADMIN_SECRET_ENDPOINT}`,
+      sha256fingerprint: fingerprint,
+      name: "Current server",
+      type: "amnezia",
+    },
+    {
+      managementAPI: `https://${config.SB_PUBLIC_IP}:${config.SB_API_PORT}/${config.SB_API_PREFIX}`,
+      sha256fingerprint: fingerprint,
+      name: "Current server",
+      type: "outline",
+    },
+  ];
+  await fsp.writeFile(config.INVENTORY_FILE, JSON.stringify(initialInventory));
   await ensureWireguardServerConfig(config);
 }
 

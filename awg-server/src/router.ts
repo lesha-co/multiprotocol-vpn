@@ -1,6 +1,6 @@
 import { addUser, deleteUser, listUsers } from "./WGUserManager.ts";
 import express from "express";
-import { Key, Server, ListKeysResponse } from "../../schemas/types.ts";
+import { Key, OutlineServer, ListKeysResponse } from "../../schemas/types.ts";
 import { readConfigFromEnv } from "../../facilities/readConfig.ts";
 const config = await readConfigFromEnv();
 const router = express.Router();
@@ -22,7 +22,7 @@ router.get("/health", (req, res) => {
 // Server configuration endpoints
 router.get("/server", (req, res) => {
   // Return server information according to the API specification
-  const serverInfo: Server = {
+  const serverInfo: OutlineServer = {
     name: "WireGuard VPN Server",
     serverId: "wireguard-server-001",
     metricsEnabled: false,

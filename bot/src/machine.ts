@@ -2,7 +2,7 @@ import type TelegramBot from "node-telegram-bot-api";
 import type { StateMachine } from "./lib/stateMachineRunner.ts";
 import { createMessage } from "./lib/telegram/createMessage.ts";
 import { getAllKeys, userToString } from "./lib/getAllKeys.ts";
-import { inventory } from "./inventory.ts";
+import { readInventory } from "./inventory.ts";
 import { Outline, randomString } from "./lib/backends/outline.ts";
 
 type SendOptions = {
@@ -117,7 +117,8 @@ export const stateMachine: StateMachine<
       }
 
       const [serverName, id] = response.split(":");
-      const server = inventory.servers.find((x) => x.name === serverName);
+      const inventory = await readInventory();
+      const server = inventory.find((x) => x.name === serverName);
       if (!server) {
         await send({ text: "Сервер не найден" });
         return { id: "start" };
@@ -162,9 +163,8 @@ export const stateMachine: StateMachine<
       return { id: "start" };
     },
     async outline({ send, input, user }) {
-      const outlineServers = inventory.servers.filter(
-        (x) => x.type === "outline",
-      );
+      const inventory = await readInventory();
+      const outlineServers = inventory.filter((x) => x.type === "outline");
       const servers = outlineServers.map((x) => [{ text: x.name }]);
 
       const selectedServer = await input({

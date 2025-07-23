@@ -1,4 +1,4 @@
-import { inventory } from "../inventory.ts";
+import { readInventory } from "../inventory.ts";
 import { Outline } from "./backends/outline.ts";
 import TelegramBot from "node-telegram-bot-api";
 
@@ -10,7 +10,8 @@ function getKeyBelongsToUser(keyName: string, user: TelegramBot.User) {
 }
 
 export async function getAllKeys(user: TelegramBot.User) {
-  const outlineServers = inventory.servers.filter((x) => x.type === "outline");
+  const inventory = await readInventory();
+  const outlineServers = inventory.filter((x) => x.type === "outline");
   const outlineAPIs = outlineServers.map((server) => ({
     server,
     api: new Outline(server.managementAPI, server.sha256fingerprint),

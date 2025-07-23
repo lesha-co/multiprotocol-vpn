@@ -28,17 +28,3 @@ type CommandHandler = {
 };
 
 type CommandDirectory = Record<string, CommandHandler>;
-
-type OutlineServer = {
-  name: string;
-  type: "outline";
-  managementAPI: string;
-  sha256fingerprint: string;
-};
-
-type AmneziaServer = {
-  name: string;
-  type: "amnezia";
-};
-
-type Server = OutlineServer | AmneziaServer;

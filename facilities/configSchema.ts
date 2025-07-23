@@ -21,6 +21,8 @@ export const Config = z.object({
   SB_API_PREFIX: z.string(),
   SB_CERTIFICATE_FILE: z.string(),
   SB_PRIVATE_KEY_FILE: z.string(),
+
+  INVENTORY_FILE: z.string(),
 });
 
 export type Config = z.infer<typeof Config>;

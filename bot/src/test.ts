@@ -1,13 +1,16 @@
 import { test, describe } from "node:test";
 import { strictEqual, ok, match } from "node:assert";
 import { secureFetch } from "./api/fetch.ts";
-import { inventory } from "./inventory.ts";
-import { Key } from "../../schemas/types.ts";
-import { Outline } from "./lib/backends/outline.ts";
 
-const servers: OutlineServer[] = inventory.servers.filter(
+import { Key, OutlineServerInventory } from "../../schemas/types.ts";
+import { Outline } from "./lib/backends/outline.ts";
+import { readInventory } from "./inventory.ts";
+
+const inventory = await readInventory();
+const servers: OutlineServerInventory[] = inventory.filter(
   (x) => x.type === "outline",
 )!;
+
 const sgp1 = servers.find((x) => x.name === "sgp1")!;
 
 const baseUrl = sgp1.managementAPI;

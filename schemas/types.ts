@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const Server = z.object({
+export const OutlineServer = z.object({
   name: z.string(),
   serverId: z.string(),
   metricsEnabled: z.boolean(),
@@ -10,7 +10,7 @@ export const Server = z.object({
   hostnameForAccessKeys: z.string(),
 });
 
-export type Server = z.infer<typeof Server>;
+export type OutlineServer = z.infer<typeof OutlineServer>;
 
 export const Key = z.object({
   id: z.string(),
@@ -27,3 +27,26 @@ export const ListKeysResponse = z.object({
 });
 
 export type ListKeysResponse = z.infer<typeof ListKeysResponse>;
+
+export const OutlineServerInventory = z.object({
+  name: z.string(),
+  type: z.literal("outline"),
+  managementAPI: z.string(),
+  sha256fingerprint: z.string(),
+});
+
+export const AmneziaServerInventory = z.object({
+  name: z.string(),
+  type: z.literal("amnezia"),
+  managementAPI: z.string(),
+  sha256fingerprint: z.string(),
+});
+
+export const ServerInventory = z.union([
+  OutlineServerInventory,
+  AmneziaServerInventory,
+]);
+
+export type OutlineServerInventory = z.infer<typeof OutlineServerInventory>;
+export type AmneziaServerInventory = z.infer<typeof AmneziaServerInventory>;
+export type ServerInventory = z.infer<typeof ServerInventory>;

@@ -1,7 +1,11 @@
 import assert from "node:assert";
 import crypto from "node:crypto";
 import { secureFetch } from "../../api/fetch.ts";
-import { ListKeysResponse, Key, Server } from "../../../../schemas/types.ts";
+import {
+  ListKeysResponse,
+  Key,
+  OutlineServer,
+} from "../../../../schemas/types.ts";
 export function randomString() {
   return crypto.randomBytes(24).toString("base64");
 }
@@ -22,10 +26,10 @@ export class Outline {
     });
   }
 
-  async getServer(): Promise<Server> {
+  async getServer(): Promise<OutlineServer> {
     const response = await this.fetch(`${this.mgmt}/server`);
     const json = await response.json();
-    const parsed = Server.parse(json);
+    const parsed = OutlineServer.parse(json);
     return parsed;
   }
   async listKeys(): Promise<Key[]> {
