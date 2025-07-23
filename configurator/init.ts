@@ -50,7 +50,10 @@ async function createFiles(config: Config) {
       type: "outline",
     },
   ];
-  await fsp.writeFile(config.INVENTORY_FILE, JSON.stringify(initialInventory));
+  await fsp.writeFile(
+    config.INVENTORY_FILE,
+    JSON.stringify(initialInventory, null, 2),
+  );
   await ensureWireguardServerConfig(config);
 }
 
