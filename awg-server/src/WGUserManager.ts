@@ -50,7 +50,7 @@ function validateUsername(config: Config, username: string) {
   // Validate username format (alphanumeric and underscores only)
   if (!/^[a-zA-Z0-9_\~]+$/.test(username)) {
     throw new Error(
-      "Username can only contain letters, numbers, and underscores",
+      "Username can only contain letters, numbers, and underscores and tilde",
     );
   }
 
