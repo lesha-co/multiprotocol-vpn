@@ -43,6 +43,7 @@ services:
       dockerfile: .dockerfiles/Dockerfile-telegram-bot
     container_name: tg-bot
     volumes:
+      - ./data:/data
       - ./.env:/.env
     restart: unless-stopped
     environment:
