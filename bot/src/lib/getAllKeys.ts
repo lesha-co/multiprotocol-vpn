@@ -3,10 +3,10 @@ import { Outline } from "./backends/outline.ts";
 import TelegramBot from "node-telegram-bot-api";
 
 export function userToString(user: TelegramBot.User) {
-  return `${user.id}#${user.username ?? "<unnamed>"}`;
+  return `${user.id}~${user.username ?? "<unnamed>"}`;
 }
 function getKeyBelongsToUser(keyName: string, user: TelegramBot.User) {
-  return keyName.split("#")[0] === user.id.toString();
+  return keyName.split("~")[0] === user.id.toString();
 }
 
 export async function getAllKeys(user: TelegramBot.User) {

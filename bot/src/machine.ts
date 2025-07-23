@@ -158,8 +158,42 @@ export const stateMachine: StateMachine<
           return { id: "start" };
       }
     },
-    async amnezia({ send }) {
-      await send({ text: "Не поддерживается" });
+    async amnezia({ send, input, user }) {
+      const inventory = await readInventory();
+      const outlineServers = inventory.filter((x) => x.type === "amnezia");
+      const servers = outlineServers.map((x) => [{ text: x.name }]);
+
+      const selectedServer = await input({
+        text: `Какой сервер?`,
+        options: {
+          reply_markup: {
+            keyboard: servers,
+          },
+        },
+      } as const);
+
+      const server = outlineServers.find((x) => x.name === selectedServer);
+      if (!server) {
+        await send({ text: "Сервер не найден" });
+        return { id: "start" };
+      }
+
+      const outlineClient = new Outline(
+        server.managementAPI,
+        server.sha256fingerprint,
+      );
+      const key = await outlineClient.createKey(
+        `${userToString(user)}~${randomString()}`,
+      );
+      const keytext = "```" + key.accessUrl + "```";
+
+      await send(
+        createMessage(`Выбран сервер ${server?.name}\n${keytext}`, {
+          md: true,
+          removeKeyboard: true,
+        }),
+      );
+
       return { id: "start" };
     },
     async outline({ send, input, user }) {
@@ -187,7 +221,7 @@ export const stateMachine: StateMachine<
         server.sha256fingerprint,
       );
       const key = await outlineClient.createKey(
-        `${userToString(user)}#${randomString()}`,
+        `${userToString(user)}~${randomString()}`,
       );
 
       const keytext = "```" + key.accessUrl + "```";
