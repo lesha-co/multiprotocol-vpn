@@ -5,6 +5,7 @@ import { makeCertificate } from "../facilities/makeCertificate.ts";
 import { exists } from "../facilities/exists.ts";
 import { Config } from "../facilities/configSchema.ts";
 import assert from "node:assert";
+import ensureSSLCertificate from "../facilities/ensureSSLCertificate.ts";
 
 async function ensureWireguardServerConfig(config: Config) {
   // Create initial server configuration
@@ -26,11 +27,32 @@ async function ensureWireguardServerConfig(config: Config) {
 }
 
 async function createFiles(config: Config) {
+  await fsp.mkdir(config.SB_STATE_DIR, { recursive: true });
+  await fsp.chmod(config.SB_STATE_DIR, 0o770);
+
   await fsp.mkdir(config.WIREGUARD_USER_KEYS_ROOT, {
     recursive: true,
   });
   await makeCertificate(config.HTTPS_KEY_PATH, config.HTTPS_CRT_PATH);
   await ensureWireguardServerConfig(config);
+}
+
+function printConfig(config: Config) {
+  const fingerprint = ensureSSLCertificate(config);
+  console.log("Wireguard Server Configuration:");
+  console.log(
+    JSON.stringify({
+      apiUrl: `https://${config.WIREGUARD_EXTERNAL_IP}:${config.WIREGUARD_ADMIN_PORT}/${config.WIREGUARD_ADMIN_SECRET_ENDPOINT}`,
+      certSha256: fingerprint,
+    }),
+  );
+  console.log("Outline Server Configuration:");
+  console.log(
+    JSON.stringify({
+      apiUrl: `https://${config.SB_PUBLIC_IP}:${config.SB_API_PORT}/${config.SB_API_PREFIX}`,
+      certSha256: fingerprint,
+    }),
+  );
 }
 
 export async function main() {
@@ -59,15 +81,16 @@ export async function main() {
       (await exists(config.WIREGUARD_SERVER_INTERFACE_CONFIG))
     ) {
       console.log(`+ additional files exist `);
-      return;
     } else {
       console.error(`! creating wg config and https certificate `);
       await createFiles(config);
     }
+    printConfig(config);
   } else {
     console.error("! Main config file does not exist");
     const config = await writeConfig("/.env");
     await createFiles(config);
+    printConfig(config);
   }
 }
 

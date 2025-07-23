@@ -43,9 +43,9 @@ export async function createConfigObject(
   outlineAdminPort: string,
 ) {
   const serverKeys = generate25519();
-
+  const ip = await getIP();
   const config: Config = {
-    WIREGUARD_EXTERNAL_IP: await getIP(),
+    WIREGUARD_EXTERNAL_IP: ip,
     WIREGUARD_PORT: awgServerPort,
     WIREGUARD_DNS: "8.8.8.8, 8.8.4.4",
     WIREGUARD_VPN_PARAMS: generateVPNParams(),
@@ -60,11 +60,12 @@ export async function createConfigObject(
     HTTPS_KEY_PATH: "/data/cert.key",
     HTTPS_CRT_PATH: "/data/cert.crt",
 
+    SB_PUBLIC_IP: ip,
     SB_STATE_DIR: "/data/outline-persisted-state",
     SB_API_PORT: outlineAdminPort,
     SB_API_PREFIX: randomString(),
-    SB_CERTIFICATE_FILE: "/data/cert.key",
-    SB_PRIVATE_KEY_FILE: "/data/cert.crt",
+    SB_CERTIFICATE_FILE: "/data/cert.crt",
+    SB_PRIVATE_KEY_FILE: "/data/cert.key",
   };
 
   const envString = Object.entries(config)

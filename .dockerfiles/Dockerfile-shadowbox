@@ -1,6 +1,7 @@
 FROM quay.io/outline/shadowbox:stable
 
+COPY shadowbox/run.sh /opt/outline-server/run.sh
 
-COPY shadowbox/run.sh .
+RUN chmod +x /opt/outline-server/run.sh
 
-CMD ["./run.sh"]
+CMD ["/opt/outline-server/run.sh"]

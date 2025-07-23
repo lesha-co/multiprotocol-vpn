@@ -15,6 +15,7 @@ export const Config = z.object({
   HTTPS_KEY_PATH: z.string(),
   HTTPS_CRT_PATH: z.string(),
 
+  SB_PUBLIC_IP: z.string(),
   SB_STATE_DIR: z.string(),
   SB_API_PORT: z.string(),
   SB_API_PREFIX: z.string(),

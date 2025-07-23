@@ -11,7 +11,7 @@ services:
 
   awg-server:
     build:
-      context: .dockerfiles
+      context: .
       dockerfile: .dockerfiles/Dockerfile-awg-server
     container_name: awg-server
     ports:
@@ -49,13 +49,17 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
 
   shadowbox:
-    image: quay.io/outline/shadowbox:stable
+    # image: quay.io/outline/shadowbox:stable
+    build:
+      context: .
+      dockerfile: .dockerfiles/Dockerfile-shadowbox
     container_name: shadowbox
     network_mode: host
     restart: always
     logging:
-      driver: local
+      driver: json-file
 
+    env_file: .env
     volumes:
       - ./data:/data
       - ./.env:/.env
@@ -63,18 +67,18 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
       - "com.centurylinklabs.watchtower.scope=outline"
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: always
-    logging:
-      driver: local
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --cleanup --label-enable --scope=outline --tlsverify --interval ${WATCHTOWER_REFRESH_SECONDS:-3600}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=outline"
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   restart: always
+  #   logging:
+  #     driver: json-file
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --cleanup --label-enable --scope=outline --tlsverify --interval ${WATCHTOWER_REFRESH_SECONDS:-3600}
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=true"
+  #     - "com.centurylinklabs.watchtower.scope=outline"
 
 networks:
   amneziawg-network:
