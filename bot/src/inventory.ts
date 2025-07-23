@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
-import { Config } from "../../facilities/configSchema";
-import { ServerInventory } from "../../schemas/types";
+import type { Config } from "../../facilities/configSchema.ts";
+import { ServerInventory } from "../../schemas/types.ts";
 import z from "zod";
-import { readConfigFromEnv } from "../../facilities/readConfig";
+import { readConfigFromEnv } from "../../facilities/readConfig.ts";
 
 export async function readInventory(): Promise<ServerInventory[]> {
   const config = await readConfigFromEnv();
