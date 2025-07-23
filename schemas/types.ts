@@ -18,7 +18,7 @@ export const Key = z.object({
   password: z.string(),
   port: z.number(),
   method: z.string(),
-  accessUrl: z.url(),
+  accessUrl: z.string(),
 });
 export type Key = z.infer<typeof Key>;
 
