@@ -236,7 +236,7 @@ export function listUsers(config: Config) {
     config.WIREGUARD_SERVER_INTERFACE_CONFIG,
     "utf8",
   );
-  const userRegex = /# Peer configuration for (\w+)/g;
+  const userRegex = /# Peer configuration for ([a-zA-Z0-9_\~]+)/g;
   const users = [];
   let match;
   while ((match = userRegex.exec(serverConfig)) !== null) {
