@@ -7,7 +7,7 @@ import {
   OutlineServer,
 } from "../../../../schemas/types.ts";
 export function randomString() {
-  return crypto.randomBytes(24).toString("base64");
+  return crypto.randomBytes(24).toString("hex");
 }
 
 export class Outline {
