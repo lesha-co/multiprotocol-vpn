@@ -35,8 +35,15 @@ export class Outline {
   async listKeys(): Promise<Key[]> {
     const response = await this.fetch(`${this.mgmt}/access-keys`);
     const json = await response.json();
-    const parsed = ListKeysResponse.parse(json);
-    return parsed.accessKeys;
+    const parsed = ListKeysResponse.safeParse(json);
+    if (parsed.success) {
+      return parsed.data.accessKeys;
+    } else {
+      console.log("-- OOPS ------------------------------");
+      console.log(JSON.stringify(json, null, 2));
+      console.log("-- OOPS ------------------------------");
+      throw parsed.error;
+    }
   }
   async getKey(id: string): Promise<Key | undefined> {
     const response = await this.fetch(`${this.mgmt}/access-keys/${id}`);
