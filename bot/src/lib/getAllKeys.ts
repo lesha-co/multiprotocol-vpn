@@ -11,8 +11,8 @@ function getKeyBelongsToUser(keyName: string, user: TelegramBot.User) {
 
 export async function getAllKeys(user: TelegramBot.User) {
   const inventory = await readInventory();
-  const outlineServers = inventory.filter((x) => x.type === "outline");
-  const outlineAPIs = outlineServers.map((server) => ({
+
+  const outlineAPIs = inventory.map((server) => ({
     server,
     api: new Outline(server.managementAPI, server.sha256fingerprint),
   }));
