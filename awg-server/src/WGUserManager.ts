@@ -7,19 +7,13 @@ import type { Config } from "../../facilities/configSchema.ts";
 import assert from "node:assert";
 
 export function restart(config: Config) {
-  // run
-  // awg-quick down awg0
-  // awg-quick up awg0
-  const interfaceName = path
-    .basename(config.WIREGUARD_SERVER_INTERFACE_CONFIG)
-    .split(".")[0];
   try {
-    execSync(`awg-quick down ${interfaceName}`, {
+    execSync(`awg-quick down ${config.WIREGUARD_SERVER_INTERFACE_CONFIG}`, {
       stdio: "inherit",
     });
   } catch (x) {}
 
-  execSync(`awg-quick up ${interfaceName}`, {
+  execSync(`awg-quick up ${config.WIREGUARD_SERVER_INTERFACE_CONFIG}`, {
     stdio: "inherit",
   });
 }
