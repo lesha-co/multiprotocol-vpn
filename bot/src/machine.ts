@@ -116,7 +116,7 @@ export const stateMachine: StateMachine<
         return { id: "start" };
       }
 
-      const [serverName, id] = response.split(":");
+      const [serverName, id] = response.split("~");
       const inventory = await readInventory();
       const server = inventory.find((x) => x.name === serverName);
       if (!server) {
