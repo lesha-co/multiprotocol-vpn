@@ -105,7 +105,7 @@ export const stateMachine: StateMachine<
             keyboard: [
               [{ text: "🏠 Главное меню" }],
               ...allKeys.map((key) => [
-                { text: `${key.server.name}:${key.key.id}:${key.key.name}` },
+                { text: `${key.server.name}:${key.key.id}~${key.key.name}` },
               ]),
             ],
           },
@@ -116,7 +116,7 @@ export const stateMachine: StateMachine<
         return { id: "start" };
       }
 
-      const [serverName, id] = response.split("~");
+      const [serverName, id] = response.split(":");
       const inventory = await readInventory();
       const server = inventory.find((x) => x.name === serverName);
       if (!server) {
