@@ -14,6 +14,16 @@ const bot = getBot();
 const p = pipe<TelegramBot.Message>();
 bot.on("message", p.submit);
 
+await classifier<TelegramBot.Message, Meta>(
+  p.generator,
+  (m) => m.chat.id,
+  (m) => ({
+    chat: m.chat,
+    user: m.from,
+  }),
+  getConsumer(stateMachine, getContext),
+);
+
 function getContext(
   iterator: AsyncIterableIterator<TelegramBot.Message>,
   meta: Meta,
@@ -24,7 +34,8 @@ function getContext(
   let context: TelegramDialogContext = {
     async send(s) {
       let msg = structuredClone(s);
-      bot.sendMessage(meta.chat.id, msg.text, msg.options);
+      logMessage(user, "out", msg.text);
+      await bot.sendMessage(meta.chat.id, msg.text, msg.options);
     },
 
     async get() {
@@ -32,6 +43,7 @@ function getContext(
       if (r.done) {
         throw new Error("No more messages");
       }
+      logMessage(user, "in", r.value.text ?? "<no text>");
       return r.value.text ?? "";
     },
 
@@ -43,6 +55,7 @@ function getContext(
       )
         .flat()
         .map((x) => x.text);
+
       while (true) {
         await context.send(msg);
         const reply = await context.get();
@@ -56,12 +69,17 @@ function getContext(
   return context;
 }
 
-await classifier<TelegramBot.Message, Meta>(
-  p.generator,
-  (m) => m.chat.id,
-  (m) => ({
-    chat: m.chat,
-    user: m.from,
-  }),
-  getConsumer(stateMachine, getContext),
-);
+function logMessage(
+  user: TelegramBot.User,
+  dir: "in" | "out",
+  contents: string,
+) {
+  const d = dir === "in" ? " |>" : "<| ";
+  const lines = contents.split("\n");
+  const username = user.username ?? user.id.toString();
+  const usernameSpaces = "".padStart(username.length);
+  console.log(`${user.username} ${d} ${lines[0]}`);
+  for (const line of lines.slice(1)) {
+    console.log(`${usernameSpaces} ${d} ${line}`);
+  }
+}

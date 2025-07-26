@@ -12,6 +12,7 @@
     "config": "node configurator/init.ts",
     "awg-server:start-api": "node awg-server/src/index.ts",
     "tgbot:start": "node bot/src/index.ts",
+    "tgbot:start-local": "node --env-file=.env.local bot/src/index.ts",
     "tgbot:test": "node --test bot/src/test.ts"
   },
   "dependencies": {

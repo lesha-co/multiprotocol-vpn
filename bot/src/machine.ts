@@ -1,5 +1,6 @@
 import type TelegramBot from "node-telegram-bot-api";
 import type { StateMachine } from "./lib/stateMachineRunner.ts";
+import type { ServerInventory } from "../../schemas/types.ts";
 import { createMessage } from "./lib/telegram/createMessage.ts";
 import { getAllKeys, userToString } from "./lib/getAllKeys.ts";
 import { readInventory } from "./inventory.ts";
@@ -29,47 +30,51 @@ export type TelegramDialogContext = {
 };
 
 export const stateMachine: StateMachine<
-  | { id: "root"; transitions: "start" }
-  | { id: "start"; transitions: "my_keys" | "new_key" }
-  | { id: "my_keys"; transitions: "start" | "delete_key" }
-  | { id: "delete_key"; transitions: "start" }
-  | { id: "new_key"; transitions: "amnezia" | "outline" | "start" }
-  | { id: "amnezia"; transitions: "start" }
-  | { id: "outline"; transitions: "start" },
+  | { id: "root"; transitions: "my_keys" | "new_key" | "guide" }
+  | { id: "my_keys"; transitions: "root" | "delete_key" }
+  | { id: "delete_key"; transitions: "root" }
+  | { id: "new_key"; transitions: "root" }
+  | { id: "guide"; transitions: "root" },
   TelegramDialogContext
 > = {
   states: {
-    async root({ send }) {
-      await send({ text: "Hello!" });
-      return { id: "start" };
-    },
-    async start({ input }) {
+    async root({ input }) {
       const response = await input({
         text: "Выбери действие",
         options: {
           reply_markup: {
-            keyboard: [[{ text: "Хочу новый ключ" }, { text: "Мои ключи" }]],
+            keyboard: [
+              [{ text: "Хочу новый ключ" }],
+              [{ text: "Мои ключи" }],
+              [{ text: "Инструкция" }],
+            ],
           },
         },
       } as const);
 
       if (response === "Хочу новый ключ") {
         return { id: "new_key" };
+      } else if (response === "Инструкция") {
+        return { id: "guide" };
       } else {
         response satisfies "Мои ключи";
         return { id: "my_keys" };
       }
+    },
+    async guide({ send }) {
+      send("");
+      return { id: "root" };
     },
     async my_keys({ send, user, input }) {
       const keys = await getAllKeys(user);
 
       if (keys.length === 0) {
         send({ text: "У тебя ещё нет ключей" });
-        return { id: "start" };
+        return { id: "root" };
       }
       const keyList = keys.map(
         (x) =>
-          `${x.key.name}\n${x.server.name} (${x.server.type}) \n \`\`\`\n${x.key.accessUrl}\n\`\`\``,
+          `${x.server.name} (${x.server.type}) — ${x.key.name}  \n \`\`\`\n${x.key.accessUrl}\n\`\`\``,
       );
 
       const response = await input({
@@ -86,7 +91,7 @@ export const stateMachine: StateMachine<
       } as const);
 
       if (response === "🏠 Главное меню") {
-        return { id: "start" };
+        return { id: "root" };
       }
 
       return { id: "delete_key" };
@@ -95,7 +100,7 @@ export const stateMachine: StateMachine<
       const allKeys = await getAllKeys(user);
       if (allKeys.length === 0) {
         await send({ text: "У тебя ещё нет ключей" });
-        return { id: "start" };
+        return { id: "root" };
       }
 
       const response = await input({
@@ -105,7 +110,7 @@ export const stateMachine: StateMachine<
             keyboard: [
               [{ text: "🏠 Главное меню" }],
               ...allKeys.map((key) => [
-                { text: `${key.server.name}:${key.key.id}~${key.key.name}` },
+                { text: `${key.server.name} — ${key.key.name}` },
               ]),
             ],
           },
@@ -113,29 +118,30 @@ export const stateMachine: StateMachine<
       } as const);
 
       if (response === "🏠 Главное меню") {
-        return { id: "start" };
+        return { id: "root" };
       }
 
-      const [serverName, id] = response.split(":");
-      const inventory = await readInventory();
-      const server = inventory.find((x) => x.name === serverName);
-      if (!server) {
-        await send({ text: "Сервер не найден" });
-        return { id: "start" };
-      }
-      if (server.type === "amnezia") {
-        await send({ text: "Amnezia не поддерживается" });
-        return { id: "start" };
-      }
-      const outline = new Outline(
-        server.managementAPI,
-        server.sha256fingerprint,
+      // todo: outline keys reutrn numeric ids, not names
+      const [serverName, keyName] = response.split(" — ");
+      // find the key id
+      //
+      const keyPair = allKeys.find(
+        (x) => x.server.name === serverName && x.key.name === keyName,
       );
-      await outline.deleteKey(id);
+      if (!keyPair) {
+        await send({ text: "Ключ не найден" });
+        return { id: "root" };
+      }
+
+      const outline = new Outline(
+        keyPair.server.managementAPI,
+        keyPair.server.sha256fingerprint,
+      );
+      await outline.deleteKey(keyPair.key.id);
       await send({ text: "Операция выполнена" });
-      return { id: "start" };
+      return { id: "root" };
     },
-    async new_key({ input }) {
+    async new_key({ input, send, user }) {
       const response = await input({
         text: `Какой протокол?`,
         options: {
@@ -149,19 +155,17 @@ export const stateMachine: StateMachine<
         },
       } as const);
 
-      switch (response) {
-        case "Amnezia":
-          return { id: "amnezia" };
-        case "Outline":
-          return { id: "outline" };
-        default:
-          return { id: "start" };
+      if (response === "Отмена") {
+        return { id: "root" };
       }
-    },
-    async amnezia({ send, input, user }) {
+      response satisfies "Amnezia" | "Outline";
+
+      const type: ServerInventory["type"] =
+        response === "Amnezia" ? "amnezia" : "outline";
+
       const inventory = await readInventory();
-      const outlineServers = inventory.filter((x) => x.type === "amnezia");
-      const servers = outlineServers.map((x) => [{ text: x.name }]);
+      const serversOfType = inventory.filter((x) => x.type === type);
+      const servers = serversOfType.map((x) => [{ text: x.name }]);
 
       const selectedServer = await input({
         text: `Какой сервер?`,
@@ -172,48 +176,10 @@ export const stateMachine: StateMachine<
         },
       } as const);
 
-      const server = outlineServers.find((x) => x.name === selectedServer);
+      const server = serversOfType.find((x) => x.name === selectedServer);
       if (!server) {
         await send({ text: "Сервер не найден" });
-        return { id: "start" };
-      }
-
-      const outlineClient = new Outline(
-        server.managementAPI,
-        server.sha256fingerprint,
-      );
-      const key = await outlineClient.createKey(
-        `${userToString(user)}~${randomString()}`,
-      );
-      const keytext = "```" + key.accessUrl + "```";
-
-      await send(
-        createMessage(`Выбран сервер ${server?.name}\n${keytext}`, {
-          md: true,
-          removeKeyboard: true,
-        }),
-      );
-
-      return { id: "start" };
-    },
-    async outline({ send, input, user }) {
-      const inventory = await readInventory();
-      const outlineServers = inventory.filter((x) => x.type === "outline");
-      const servers = outlineServers.map((x) => [{ text: x.name }]);
-
-      const selectedServer = await input({
-        text: `Какой сервер?`,
-        options: {
-          reply_markup: {
-            keyboard: servers,
-          },
-        },
-      } as const);
-
-      const server = outlineServers.find((x) => x.name === selectedServer);
-      if (!server) {
-        await send({ text: "Сервер не найден" });
-        return { id: "start" };
+        return { id: "root" };
       }
 
       const outlineClient = new Outline(
@@ -233,7 +199,7 @@ export const stateMachine: StateMachine<
         }),
       );
 
-      return { id: "start" };
+      return { id: "root" };
     },
   },
   rootState: { id: "root" },

@@ -5,4 +5,5 @@ awg-server/data
 bot/.env
 bot/db.sqlite
 .env
+.env*
 data/
