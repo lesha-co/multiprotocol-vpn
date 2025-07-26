@@ -62,7 +62,6 @@ export const stateMachine: StateMachine<
       }
     },
     async guide({ send }) {
-      send("");
       return { id: "root" };
     },
     async my_keys({ send, user, input }) {
