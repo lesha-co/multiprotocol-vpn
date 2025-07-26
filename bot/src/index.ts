@@ -35,7 +35,7 @@ function getContext(
     async send(s) {
       let msg = structuredClone(s);
       logMessage(user, "out", msg.text ?? "<no text>");
-      await bot.sendMessage(meta.chat.id, msg.text, msg.options);
+      await bot.sendMessage(meta.chat.id, msg.text ?? "no text", msg.options);
     },
 
     async get() {
