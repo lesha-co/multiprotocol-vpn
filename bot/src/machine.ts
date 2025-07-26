@@ -74,7 +74,7 @@ export const stateMachine: StateMachine<
       }
       const keyList = keys.map(
         (x) =>
-          `${x.server.name} (${x.server.type}) — ${x.key.name}  \n \`\`\`\n${x.key.accessUrl}\n\`\`\``,
+          `${x.server.name} (${x.server.type}) — ${x.key.name}  \n\`\`\`\n${x.key.accessUrl}\n\`\`\``,
       );
 
       const response = await input({
