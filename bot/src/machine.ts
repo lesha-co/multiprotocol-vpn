@@ -61,7 +61,7 @@ export const stateMachine: StateMachine<
         return { id: "my_keys" };
       }
     },
-    async guide({ send }) {
+    async guide() {
       return { id: "root" };
     },
     async my_keys({ send, user, input }) {
