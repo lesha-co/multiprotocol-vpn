@@ -1,4 +1,4 @@
-import { pipe } from "./pipe.ts";
+import pipe from "callback-to-async-generator";
 
 type Key = string | number;
 
@@ -18,8 +18,8 @@ export async function classifier<T, Meta>(
   for await (const item of source()) {
     const key = getKey(item);
     if (sinks[key] === undefined) {
-      let { submit, generator } = pipe<T>();
-      sinks[key] = submit;
+      let { send, generator } = pipe<T>();
+      sinks[key] = send;
       let meta = getMeta(item);
       promises.push(consumer(generator, meta));
     }

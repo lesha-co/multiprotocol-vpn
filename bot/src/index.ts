@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import { classifier } from "./lib/asyncTools/classifier.ts";
-import { pipe } from "./lib/asyncTools/pipe.ts";
+import pipe from "callback-to-async-generator";
 import { getBot } from "./lib/telegram/getBot.ts";
 import { stateMachine } from "./machine.ts";
 import type { TelegramDialogContext } from "./machine.ts";
@@ -12,7 +12,7 @@ readConfigFromEnv();
 
 const bot = getBot();
 const p = pipe<TelegramBot.Message>();
-bot.on("message", p.submit);
+bot.on("message", p.send);
 
 await classifier<TelegramBot.Message, Meta>(
   p.generator,
