@@ -1,5 +1,5 @@
-import { readInventory } from "../inventory.ts";
-import { Outline } from "./backends/outline.ts";
+import { readInventory } from "./inventory.ts";
+import { Outline } from "./outline.ts";
 import TelegramBot from "node-telegram-bot-api";
 
 export function userToString(user: TelegramBot.User) {

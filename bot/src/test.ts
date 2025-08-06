@@ -1,9 +1,9 @@
 import { test, describe } from "node:test";
 import { strictEqual, ok, match } from "node:assert";
-import { secureFetch } from "./api/fetch.ts";
+import { secureFetch } from "./fetch.ts";
 
 import { Key, OutlineServerInventory } from "../../schemas/types.ts";
-import { Outline } from "./lib/backends/outline.ts";
+import { Outline } from "./outline.ts";
 import { readInventory } from "./inventory.ts";
 
 const inventory = await readInventory();

@@ -1,10 +1,10 @@
 import type TelegramBot from "node-telegram-bot-api";
-import type { StateMachine } from "./lib/stateMachineRunner.ts";
+import type { StateMachine } from "telegram-bot-framework-state-machine";
 import type { ServerInventory } from "../../schemas/types.ts";
-import { createMessage } from "./lib/telegram/createMessage.ts";
-import { getAllKeys, userToString } from "./lib/getAllKeys.ts";
+import { createMessage } from "telegram-bot-framework-state-machine";
+import { getAllKeys, userToString } from "./getAllKeys.ts";
 import { readInventory } from "./inventory.ts";
-import { Outline, randomString } from "./lib/backends/outline.ts";
+import { Outline, randomString } from "./outline.ts";
 
 type SendOptions = {
   text: string;
