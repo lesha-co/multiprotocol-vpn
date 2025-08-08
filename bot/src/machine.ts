@@ -1,7 +1,7 @@
 import type TelegramBot from "node-telegram-bot-api";
-import type { StateMachine } from "telegram-bot-framework-state-machine";
+import type { StateMachine } from "@leshenka/state-machine-runner";
 import type { ServerInventory } from "../../schemas/types.ts";
-import { createMessage } from "telegram-bot-framework-state-machine";
+import { createMessage } from "@leshenka/telegram-bot-framework";
 import { getAllKeys, userToString } from "./getAllKeys.ts";
 import { readInventory } from "./inventory.ts";
 import { Outline, randomString } from "./outline.ts";

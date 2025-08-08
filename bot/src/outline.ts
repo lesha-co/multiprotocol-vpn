@@ -1,11 +1,7 @@
 import assert from "node:assert";
 import crypto from "node:crypto";
-import { secureFetch } from "../../api/fetch.ts";
-import {
-  ListKeysResponse,
-  Key,
-  OutlineServer,
-} from "../../../../schemas/types.ts";
+import { Key, ListKeysResponse, OutlineServer } from "../../schemas/types.ts";
+import { secureFetch } from "./fetch.ts";
 export function randomString() {
   return crypto.randomBytes(2).toString("hex");
 }
