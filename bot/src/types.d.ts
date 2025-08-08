@@ -1,5 +1,10 @@
 /// <reference types="node-telegram-bot-api" />
 
+type Meta = {
+  chat: TelegramBot.Chat;
+  user: TelegramBot.User | undefined;
+};
+
 type Context =
   | { step: "start" }
   | { step: "which_action" }

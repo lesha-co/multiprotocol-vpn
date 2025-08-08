@@ -1,16 +1,13 @@
 import TelegramBot from "node-telegram-bot-api";
-import {
-  getBot,
-  classifier,
-  getConsumer,
-} from "telegram-bot-framework-state-machine";
-import type { Meta } from "telegram-bot-framework-state-machine";
+import { getBot, classifier } from "telegram-bot-framework-state-machine";
+
 import pipe from "callback-to-async-generator";
 
 import { stateMachine } from "./machine.ts";
 import type { TelegramDialogContext } from "./machine.ts";
 
 import { readConfigFromEnv } from "../../facilities/readConfig.ts";
+import { executeStateMachine } from "@leshenka/state-machine-runner";
 
 readConfigFromEnv();
 
@@ -25,7 +22,10 @@ await classifier<TelegramBot.Message, Meta>(
     chat: m.chat,
     user: m.from,
   }),
-  getConsumer(stateMachine, getContext),
+  async (iterator, meta) => {
+    const context = getContext(iterator(), meta);
+    await executeStateMachine(stateMachine, context);
+  },
 );
 
 function getContext(

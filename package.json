@@ -16,6 +16,7 @@
     "tgbot:test": "node --test bot/src/test.ts"
   },
   "dependencies": {
+    "@leshenka/state-machine-runner": "^1.0.0",
     "@stablelib/base64": "^2.0.1",
     "@stablelib/x25519": "^2.0.1",
     "@types/express": "^5.0.3",
@@ -28,7 +29,7 @@
     "raw-body": "^3.0.0",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
-    "telegram-bot-framework-state-machine": "^1.0.1",
+    "telegram-bot-framework-state-machine": "^2.0.0",
     "typescript": "^5.8.3",
     "undici": "^7.11.0",
     "zod": "^4.0.5"
